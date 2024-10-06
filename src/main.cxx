@@ -8,8 +8,6 @@
 
 // recommended changes
 // generator should be associated with network
-// template the initialiser? ->>> nightmarish task
-
 
 class initialiser{
 
@@ -23,7 +21,6 @@ class initialiser{
     virtual double generate() = 0;
 
 };
-
 
 class zeroes : public initialiser{
   public:
@@ -69,22 +66,35 @@ class gaussian: public initialiser{
 
 };
 
-double sigmoid( double x ){ return 1.0/(1.0 + exp(-x) ); }
-double sigmoid_derivative( double x ){ return sigmoid(x)*( 1 - sigmoid(x) ); }
+class activation_function {
+  public:
+    double (* activation)(double);
+    double (* derivative)(double);
 
+    activation_function( double (* activation)(double), double (* derivative)(double) ){
+      this->activation = activation;
+      this->derivative = derivative;
+    }
+};
+
+double sigmoid( double x ){ return 1.0/(1.0 + std::exp(-x) ); }
+double sigmoid_derivative( double x ){ return sigmoid(x)*( 1 - sigmoid(x) ); }
 double relu( double x ){ return std::max( 0.0, x ); }
 double relu_derivative( double x ){ return x < 0.0 ? 0.0 : 1.0; }
-
 double leaky_relu( double x ){ return std::max( -0.1*x, x );}
 double leaky_relu_derivative( double x ){ return x < 0.0 ? -0.1 : 1.0;  }
+double softsign( double x ){ return x/( 1 + std::abs(x) ); }
+double softsign_derivative( double x ){ return 1/(  (1 + std::abs(x))*( 1 + std::abs(x)) ); }
+double tanh_derivative( double x ){ return (1 - std::tanh(x)*std::tanh(x) ); }
 
-double soft_sign( double x ){ return x/( 1 + std::abs(x) ); }
-double soft_sign_derivative( double x ){ return 1/(  (1 + std::abs(x))*( 1 + std::abs(x)) ); }
-
-double tanh_derivative( double x ){ return (1 - tanh(x)*tanh(x) ); }
+static activation_function sigmoid_activation( sigmoid, sigmoid_derivative );
+static activation_function relu_activation( relu, relu_derivative );
+static activation_function leaky_relu_activation( leaky_relu, leaky_relu_derivative );
+static activation_function softsign_activation( softsign, softsign_derivative );
+static activation_function tanh_activation( std::tanh, tanh_derivative );
 
 std::vector<double> softmax( std::vector<double> output ){
-  std::ranges::for_each( output, []( double & value ){ value = exp(value); } );
+  std::ranges::for_each( output, []( double & value ){ value = std::exp(value); } );
   double total = std::accumulate( output.begin(), output.end(), 0.0 );
   std::ranges::for_each( output, [&total]( double & value ){ value /= total; } );
   return output;
@@ -118,10 +128,10 @@ class dense_layer: public layer {
 
   public:
 
-    double (*activation)( double ); 
+    activation_function * activation;
     initialiser * init;
 
-    dense_layer( int nodes, initialiser * init, double (*activation)( double ) = &sigmoid, double learning_rate = 0.15 ){
+    dense_layer( int nodes, initialiser * init, activation_function * activation, double learning_rate = 0.15 ){
       this->nodes = nodes;
       this->init = init;
       this->activation = activation;
@@ -171,7 +181,7 @@ class dense_layer: public layer {
       }
 
       // apply activation
-      std::transform( output.cbegin(), output.cend(), output.begin(), activation );
+      std::transform( output.cbegin(), output.cend(), output.begin(), activation->activation );
       
       return output;
     }
@@ -247,4 +257,9 @@ class network{
 
 };
 
-int main(){};
+int main(){
+  
+  dense_layer dl( 32, &zeroes_initialiser, &sigmoid_activation, 0.10 );
+
+
+};
