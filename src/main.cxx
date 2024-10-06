@@ -259,6 +259,7 @@ class network{
 
 int main(){
   
+  zeroes zeroes_initialiser;
   dense_layer dl( 32, &zeroes_initialiser, &sigmoid_activation, 0.10 );
 
 
