@@ -7,7 +7,13 @@
                 "/usr/lib"
             ],
             "defines": [],
-            "compilerPath": "/sbin/clang"
+            "compilerPath": "/sbin/clang",
+            "cppStandard": "c++23",
+            "cStandard": "c23",
+            "intelliSenseMode": "linux-clang-x64",
+            "compilerArgs": [
+                "-std=c++23"
+            ]
         }
     ],
     "version": 4

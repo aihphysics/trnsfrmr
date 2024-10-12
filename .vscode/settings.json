@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "chrono": "cpp",
+    "ranges": "cpp",
+    "variant": "cpp"
+  }
+}

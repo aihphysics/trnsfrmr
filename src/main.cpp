@@ -5,6 +5,10 @@
 #include <ranges>
 #include <utility>
 #include <tuple>
+#include <iostream>
+#include <stdlib.h>
+
+
 
 // recommended changes
 // generator should be associated with network
@@ -261,6 +265,7 @@ int main(){
   
   zeroes zeroes_initialiser;
   dense_layer dl( 32, &zeroes_initialiser, &sigmoid_activation, 0.10 );
+  std::cout << "runs" << std::endl;
 
 
 };
